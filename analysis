@@ -1,0 +1,136 @@
+
+import pandas as pd
+import numpy as np
+
+df1 = pd.DataFrame({
+    "Employee": ["Arun", None, "John", "Anu", "Meera"],
+    "Age": [25, np.nan, 30, 28, 26],
+    "Salary": [30000, 45000, np.nan, 40000, 35000],
+    "Department": ["IT", "HR", None, "IT", "Finance"]
+})
+df1["Employee"] = df1["Employee"].fillna("Unknown")
+df1["Age"] = df1["Age"].fillna(df1["Age"].median())
+df1["Salary"] = df1["Salary"].fillna(df1["Salary"].median())
+df1["Department"] = df1["Department"].fillna("Not Assigned")
+print("\nTASK 1: MISSING VALUES\n", df1)
+
+df2 = pd.DataFrame({
+    "OrderID": [101, 102, 103, 102, 104, 101],
+    "Customer": ["Arun", "Meera", "John", "Meera", "Anu", "Arun"],
+    "Amount": [1500, 2500, 1800, 2500, 3200, 1500]
+})
+df2 = df2.drop_duplicates()
+print("\nTASK 2: DUPLICATES REMOVED\n", df2)
+
+df3 = pd.DataFrame({
+    "emp name": [" arun ", "MEERA", "John ", " anu"],
+    "dept name": ["it", "HR", "finance", "It"],
+    "monthly salary": [30000, 45000, 35000, 40000]
+})
+df3 = df3.rename(columns={
+    "emp name": "Employee",
+    "dept name": "Department",
+    "monthly salary": "Salary"
+})
+df3["Employee"] = df3["Employee"].str.strip().str.title()
+df3["Department"] = df3["Department"].str.strip().str.upper()
+print("\nTASK 3: RENAMED AND STANDARDIZED\n", df3)
+
+df4 = pd.DataFrame({
+    "Product": ["Laptop", "Phone", "Tablet", "Laptop", "Phone"],
+    "Price": [50000, -1000, 25000, 55000, 0],
+    "Rating": [4.5, 3.8, -1, 4.7, 6]
+})
+df4.loc[df4["Price"] <= 0, "Price"] = np.nan
+df4.loc[~df4["Rating"].between(1, 5), "Rating"] = np.nan
+df4["Price"] = df4["Price"].fillna(df4["Price"].median())
+df4["Rating"] = df4["Rating"].fillna(df4["Rating"].median())
+print("\nTASK 4: INVALID VALUES CLEANED\n", df4)
+
+df5 = pd.DataFrame({
+    "CustomerDetails": [
+        "C101-Arun-Kochi",
+        "C102-Meera-Kottayam",
+        "C103-John-Kochi",
+        "C104-Anu-Trivandrum"
+    ]
+})
+df5[["CustomerID", "Name", "City"]] = df5["CustomerDetails"].str.split("-", expand=True)
+df5["CustomerID"] = df5["CustomerID"].str.replace("C", "", regex=False)
+print("\nTASK 5: STRING EXTRACTION\n", df5)
+
+df6 = pd.DataFrame({
+    "OrderID": [101, 102, 103, 104],
+    "OrderDate": ["2026-01-15", "18/02/2026", "2026-03-10", "25/04/2026"],
+    "Amount": [1500, 2200, 1800, 3000]
+})
+df6["OrderDate"] = pd.to_datetime(df6["OrderDate"], format="mixed", dayfirst=True, errors="coerce")
+df6["Year"] = df6["OrderDate"].dt.year
+df6["Month"] = df6["OrderDate"].dt.month
+df6["Day"] = df6["OrderDate"].dt.day
+print("\nTASK 6: DATE CLEANING\n", df6)
+
+df7 = pd.DataFrame({
+    "Employee": ["Arun", "Meera", "John", "Anu", "Ravi"],
+    "Department": ["IT", "HR", "IT", "Finance", "HR"],
+    "Salary": [35000, 45000, 55000, 30000, 50000]
+})
+df7["Department"] = df7["Department"].str.strip().str.upper()
+cleaned7 = df7[
+    (df7["Salary"] >= 40000) &
+    (df7["Department"].isin(["IT", "HR"]))
+].sort_values("Salary", ascending=False)
+print("\nTASK 7: FILTERING AND SORTING\n", cleaned7)
+
+df8 = pd.DataFrame({
+    "Department": ["IT", "HR", "IT", "Finance", "HR", "IT"],
+    "Employee": ["Arun", "Meera", "John", "Anu", "Ravi", "Sara"],
+    "Salary": [35000, 45000, 55000, 30000, 50000, 60000]
+})
+df8["Department"] = df8["Department"].str.strip().str.upper()
+summary8 = df8.groupby("Department").agg(
+    EmployeeCount=("Employee", "count"),
+    AverageSalary=("Salary", "mean"),
+    TotalSalary=("Salary", "sum"),
+    MaximumSalary=("Salary", "max")
+).reset_index()
+print("\nTASK 8: GROUPBY AND AGGREGATION\n", summary8)
+
+df9 = pd.DataFrame({
+    "Employee": ["Arun", "Meera", "John", "Anu"],
+    "Salary": [25000, 40000, 60000, 35000],
+    "PerformanceScore": [55, 85, 92, 72]
+})
+df9["Salary"] = df9["Salary"].apply(lambda x: max(x, 0))
+df9["PerformanceLevel"] = df9["PerformanceScore"].apply(
+    lambda x: "Excellent" if x >= 90 else "Good" if x >= 75 else "Needs Improvement"
+)
+df9["AnnualSalary"] = df9["Salary"].apply(lambda x: x * 12)
+print("\nTASK 9: APPLY AND LAMBDA\n", df9)
+
+df10 = pd.DataFrame({
+    "OrderID": [101, 102, 103, 104, 105, 102, 106, 107],
+    "Customer": [" Arun ", "Meera", "John", "Anu", None, "Meera", "Ravi", "Sara"],
+    "Category": ["electronics", "FURNITURE", "electronics", "clothing", "furniture", "FURNITURE", "clothing", "electronics"],
+    "Quantity": [2, 1, 3, 2, np.nan, 1, 4, 2],
+    "Price": [15000, 8000, 12000, 2000, 5000, 8000, -1000, 18000],
+    "OrderDate": ["2026-01-05", "2026-01-10", "2026-02-15", "2026-02-20", "2026-03-01", "2026-01-10", "2026-03-05", "2026-03-15"]
+})
+df10["Customer"] = df10["Customer"].str.strip().str.title()
+df10["Category"] = df10["Category"].str.strip().str.title()
+df10 = df10.drop_duplicates(subset=["OrderID"], keep="first")
+df10 = df10[df10["Price"] > 0].copy()
+df10["Customer"] = df10["Customer"].fillna("Unknown")
+df10["Quantity"] = df10["Quantity"].fillna(df10["Quantity"].median())
+df10["OrderDate"] = pd.to_datetime(df10["OrderDate"], errors="coerce")
+df10["Revenue"] = df10["Quantity"] * df10["Price"]
+df10 = df10.dropna(subset=["OrderDate"])
+df10 = df10.sort_values("OrderDate").reset_index(drop=True)
+summary10 = df10.groupby("Category").agg(
+    TotalOrders=("OrderID", "count"),
+    TotalQuantity=("Quantity", "sum"),
+    TotalRevenue=("Revenue", "sum"),
+    AverageRevenue=("Revenue", "mean")
+).reset_index()
+print("\nTASK 10: COMPLETE DATA CLEANING\n", df10.to_string(index=False))
+print("\nTASK 10: CATEGORY ANALYSIS\n", summary10.to_string(index=False))
